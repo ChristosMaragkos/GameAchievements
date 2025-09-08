@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "5CgyUOkd0rg=",
+  "success": true,
+  "projectFilePath": "D:\\coding projects\\csharp\\Achievements\\Demo\\Demo.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Chris\\.nuget\\packages\\godotsharp\\4.5.0-rc.1\\godotsharp.4.5.0-rc.1.nupkg.sha512",
+    "C:\\Users\\Chris\\.nuget\\packages\\jetbrains.annotations\\2025.2.2\\jetbrains.annotations.2025.2.2.nupkg.sha512"
+  ],
+  "logs": []
+}
