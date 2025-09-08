@@ -5,10 +5,10 @@
   },
   "projects": {
     "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj": {
-      "version": "1.0.0",
+      "version": "0.1.0",
       "restore": {
         "projectUniqueName": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
-        "projectName": "Achievements",
+        "projectName": "GameAchievements",
         "projectPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
         "packagesPath": "C:\\Users\\Chris\\.nuget\\packages\\",
         "outputPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\obj\\",
@@ -48,16 +48,6 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "dependencies": {
-            "GodotSharp": {
-              "target": "Package",
-              "version": "[4.5.0-rc.1, )"
-            },
-            "JetBrains.Annotations": {
-              "target": "Package",
-              "version": "[2025.2.2, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",

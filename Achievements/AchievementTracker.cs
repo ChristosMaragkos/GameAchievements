@@ -2,14 +2,14 @@
 
 public interface IAchievementStore
 {
-    bool TryGetUnlocked(string key, out DateTime unlockedAt);
+    bool TryGetUnlockDate(string key, out DateTime unlockedAt);
     void MarkUnlocked(string key, DateTime unlockedAt);
 }
 
 public sealed class InMemoryAchievementStore : IAchievementStore
 {
     private readonly Dictionary<string, DateTime> _map = new();
-    public bool TryGetUnlocked(string key, out DateTime unlockedAt) => _map.TryGetValue(key, out unlockedAt);
+    public bool TryGetUnlockDate(string key, out DateTime unlockedAt) => _map.TryGetValue(key, out unlockedAt);
     public void MarkUnlocked(string key, DateTime unlockedAt) => _map[key] = unlockedAt;
 }
 
@@ -29,38 +29,38 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
     }
 
     private readonly IAchievementStore _store = store ?? new InMemoryAchievementStore();
-    private readonly Dictionary<string, AchievementEntry> _entries = new();
+    private readonly Dictionary<string, AchievementEntry> _entries = new(StringComparer.OrdinalIgnoreCase);
 
-    public event Action<Achievement, string, DateTime> OnUnlocked = delegate { };
+    public event Action<Achievement, DateTime> OnUnlocked = delegate { };
 
-    public void Register(Achievement achievement, string? key = null, bool evaluateImmediately = true)
+    public void Register(Achievement achievement, bool evaluateImmediately = true)
     {
-        var k = key ?? achievement.Name;
-        if (_entries.ContainsKey(k))
-            throw new InvalidOperationException($"Achievement with key '{k}' already registered.");
+        var key = achievement.Name;
+        if (_entries.ContainsKey(key))
+            throw new InvalidOperationException($"Achievement with name '{key}' already registered.");
 
         DateTime? unlockedAt = null;
         var wasUnlocked = false;
-        if (_store.TryGetUnlocked(k, out var dt))
+        if (_store.TryGetUnlockDate(key, out var dt))
         {
             wasUnlocked = true;
             unlockedAt = dt;
         }
 
-        var entry = new AchievementEntry(k, achievement, wasUnlocked, unlockedAt);
-        _entries[k] = entry;
+        var entry = new AchievementEntry(key, achievement, wasUnlocked, unlockedAt);
+        _entries[key] = entry;
 
         if (evaluateImmediately)
         {
-            Evaluate(k);
+            Evaluate(achievement);
         }
     }
 
     public IReadOnlyCollection<string> Keys => _entries.Keys;
 
-    public bool IsUnlocked(string key) => _entries.TryGetValue(key, out var e) && (e.WasUnlockedMutable || e.Achievement.IsUnlocked());
+    public bool IsUnlocked(Achievement achievement) => _entries.TryGetValue(achievement.Name, out var e) && (e.WasUnlockedMutable || e.Achievement.IsUnlocked());
 
-    public DateTime? GetUnlockedAt(string key) => _entries.TryGetValue(key, out var e) ? e.UnlockedAtMutable : null;
+    public DateTime? GetUnlockDate(Achievement achievement) => _entries.TryGetValue(achievement.Name, out var e) ? e.UnlockedAtMutable : null;
 
     public IEnumerable<(string Key, Achievement Achievement, bool IsUnlocked, DateTime? UnlockedAt)> Snapshot()
     {
@@ -69,11 +69,20 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
 
     public int EvaluateAll()
     {
-        return _entries.Keys.ToArray().Sum(key => Evaluate(key) ? 1 : 0);
+        return _entries.Values.Count(entry => Evaluate(entry.Achievement));
     }
 
-    public bool Evaluate(string key)
+    /// <summary>
+    /// Evaluates a single achievement by key, firing OnUnlocked if it transitions to unlocked.
+    /// Returns true if it was just unlocked, false otherwise.
+    /// </summary>
+    /// <param name="achievement">The achievement to evaluate.</param>
+    /// <remarks>It is best practice to retain a static read-only reference to the </remarks>
+    /// <returns>Whether the achievement was unlocked.</returns>
+    public bool Evaluate(Achievement achievement)
     {
+        var key = achievement.Name;
+        
         if (!_entries.TryGetValue(key, out var e)) return false;
 
         if (e.WasUnlockedMutable)
@@ -87,8 +96,10 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
         e.WasUnlockedMutable = true;
         e.UnlockedAtMutable = now;
         _store.MarkUnlocked(key, now);
-        OnUnlocked(e.Achievement, key, now);
+        OnUnlocked(e.Achievement, now);
         return true;
     }
 }
+
+
 

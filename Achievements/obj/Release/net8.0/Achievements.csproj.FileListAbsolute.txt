@@ -1,0 +1,12 @@
+D:\coding projects\csharp\Achievements\Achievements\bin\Release\net8.0\Achievements.deps.json
+D:\coding projects\csharp\Achievements\Achievements\bin\Release\net8.0\Achievements.dll
+D:\coding projects\csharp\Achievements\Achievements\bin\Release\net8.0\Achievements.pdb
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\Achievements.GeneratedMSBuildEditorConfig.editorconfig
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\Achievements.AssemblyInfoInputs.cache
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\Achievements.AssemblyInfo.cs
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\Achievements.csproj.CoreCompileInputs.cache
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\Achievements.sourcelink.json
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\Achievements.dll
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\refint\Achievements.dll
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\Achievements.pdb
+D:\coding projects\csharp\Achievements\Achievements\obj\Release\net8.0\ref\Achievements.dll

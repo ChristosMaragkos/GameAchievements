@@ -61,49 +61,49 @@ var all = new[] { a1, a2, a3, a4, a5 };
 
 // Tracker demo: register achievements and listen for unlocks
 var tracker = new AchievementTracker();
-tracker.OnUnlocked += (ach, key, when) =>
-    Console.WriteLine($"[Tracker] Unlocked '{ach.Name}' with key {key} at {when}");
-tracker.Register(a1, "FirstBlood");
-tracker.Register(a2, "Grinder");
-tracker.Register(a3, "Versatile");
-tracker.Register(a4, "Hardcore");
-tracker.Register(a5, "NestedMastery");
+tracker.OnUnlocked += (ach, when) =>
+    Console.WriteLine($"[Tracker] Unlocked '{ach.Name}': {ach.Description} at {when}");
+tracker.Register(a1);
+tracker.Register(a2);
+tracker.Register(a3);
+tracker.Register(a4);
+tracker.Register(a5);
 
 Console.WriteLine("Starting simulation...\n");
 
-Report();
+Console.WriteLine(Report());
 
 // Step 1: one kill -> First Blood should unlock
 state.AddKills(1);
 Console.WriteLine("After 1 kill:");
-Report();
+Console.WriteLine(Report());
 
 // Step 2: grind to 10 kills and 25 minutes -> Grinder still locked (needs 30)
 state.AddKills(9);
 state.AddMinutes(25);
 Console.WriteLine("After total 10 kills and 25 minutes:");
-Report();
+Console.WriteLine(Report());
 
 // Step 3: reach 30 minutes -> Grinder unlocks
 state.AddMinutes(5);
 Console.WriteLine("After 30 minutes:");
-Report();
+Console.WriteLine(Report());
 
 // Step 4: get 900 score -> Versatile still locked (needs 1000 score OR 50 kills)
 state.AddScore(900);
 Console.WriteLine("After 900 score:");
-Report();
+Console.WriteLine(Report());
 
 // Step 5: reach 1000 score -> Versatile unlocks
 state.AddScore(100);
 Console.WriteLine("After 1000 score:");
-Report();
+Console.WriteLine(Report());
 
 // Step 6: push to Hardcore conditions (2000 score AND 120 minutes)
 state.AddScore(1000); // now 2000
 state.AddMinutes(90); // now 120
 Console.WriteLine("After 2000 score and 120 minutes:");
-Report();
+Console.WriteLine(Report());
 
 // Final: show that OR also unlocks via the alternative path (50 kills)
 var a3B = AchievementBuilder
@@ -126,10 +126,10 @@ Func<TimePlayedCondition> TimeCtx() => () => new TimePlayedCondition { MinutesPl
 
 Func<ScoreCondition> ScoreCtx() => () => new ScoreCondition { Score = state.Score };
 
-void Report()
+int Report()
 {
     // Evaluate via tracker (fires events upon transitions)
-    tracker.EvaluateAll();
+    var unlockedCount = tracker.EvaluateAll();
 
     foreach (var a in all)
     {
@@ -137,6 +137,8 @@ void Report()
     }
 
     Console.WriteLine();
+    
+    return unlockedCount;
 }
 
 // --- types ---

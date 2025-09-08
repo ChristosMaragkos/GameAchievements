@@ -26,7 +26,7 @@ public sealed class SingleEvaluator<TC> : ICriterionEvaluator where TC : Criteri
 
 public sealed class CompositeEvaluator : ICriterionEvaluator
 {
-    private readonly List<ICriterionEvaluator> _children = new();
+    private readonly List<ICriterionEvaluator> _children = [];
     private readonly EvaluationMode _mode;
     public string Label { get; }
 
@@ -44,7 +44,7 @@ public sealed class CompositeEvaluator : ICriterionEvaluator
 
     public bool Evaluate()
     {
-        if (_children.Count == 0) return _mode == EvaluationMode.All; // vacuous truth
+        if (_children.Count == 0) return _mode == EvaluationMode.All;
         return _mode == EvaluationMode.All
             ? _children.All(c => c.Evaluate())
             : _children.Any(c => c.Evaluate());

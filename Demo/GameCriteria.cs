@@ -30,22 +30,19 @@ public sealed class ScoreCondition : CriterionCondition<ScoreCondition>
 // --- Criteria ---
 public sealed class KillCountCriterion : AbstractCriterion<KillCountCondition>
 {
-    private readonly KillCountCondition _condition;
-    public KillCountCriterion(int required) => _condition = new KillCountCondition { RequiredKills = required };
-    protected override KillCountCondition Condition => _condition;
+    public KillCountCriterion(int required) => Condition = new KillCountCondition { RequiredKills = required };
+    protected override KillCountCondition Condition { get; }
 }
 
 public sealed class TimePlayedCriterion : AbstractCriterion<TimePlayedCondition>
 {
-    private readonly TimePlayedCondition _condition;
-    public TimePlayedCriterion(double requiredMinutes) => _condition = new TimePlayedCondition { RequiredMinutes = requiredMinutes };
-    protected override TimePlayedCondition Condition => _condition;
+    public TimePlayedCriterion(double requiredMinutes) => Condition = new TimePlayedCondition { RequiredMinutes = requiredMinutes };
+    protected override TimePlayedCondition Condition { get; }
 }
 
 public sealed class ScoreCriterion : AbstractCriterion<ScoreCondition>
 {
-    private readonly ScoreCondition _condition;
-    public ScoreCriterion(int requiredScore) => _condition = new ScoreCondition { RequiredScore = requiredScore };
-    protected override ScoreCondition Condition => _condition;
+    public ScoreCriterion(int requiredScore) => Condition = new ScoreCondition { RequiredScore = requiredScore };
+    protected override ScoreCondition Condition { get; }
 }
 

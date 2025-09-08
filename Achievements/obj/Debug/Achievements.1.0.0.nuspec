@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Achievements</id>
+    <version>1.0.0</version>
+    <authors>Achievements</authors>
+    <description>Package Description</description>
+    <repository type="git" commit="46394c45e4ac6b0c6e5158e724cf90d4b5740885" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="GodotSharp" version="4.5.0-rc.1" exclude="Build,Analyzers" />
+        <dependency id="JetBrains.Annotations" version="2025.2.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\coding projects\csharp\Achievements\Achievements\bin\Debug\net8.0\Achievements.dll" target="lib\net8.0\Achievements.dll" />
+  </files>
+</package>

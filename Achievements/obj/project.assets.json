@@ -1,88 +1,21 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {
-      "GodotSharp/4.5.0-rc.1": {
-        "type": "package",
-        "compile": {
-          "lib/net8.0/GodotSharp.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/GodotSharp.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "JetBrains.Annotations/2025.2.2": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/JetBrains.Annotations.dll": {
-            "related": ".deps.json;.xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/JetBrains.Annotations.dll": {
-            "related": ".deps.json;.xml"
-          }
-        }
-      }
-    }
+    "net8.0": {}
   },
-  "libraries": {
-    "GodotSharp/4.5.0-rc.1": {
-      "sha512": "eKIoCFM27A8/43reLUCHmOYVHSNiY9CYXp+C4ZfpV7dPbCyhQ3ocZpfzRwAvjKtqPiUIJhQJwz445WAUBu34zg==",
-      "type": "package",
-      "path": "godotsharp/4.5.0-rc.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "godotsharp.4.5.0-rc.1.nupkg.sha512",
-        "godotsharp.nuspec",
-        "lib/net8.0/GodotSharp.dll",
-        "lib/net8.0/GodotSharp.xml"
-      ]
-    },
-    "JetBrains.Annotations/2025.2.2": {
-      "sha512": "0X56ZRizuHdrnPpgXjWV7f2tQO1FlQg5O1967OGKnI/4ZRNOK642J8L7brM1nYvrxTTU5TP1yRyXLRLaXLPQ8A==",
-      "type": "package",
-      "path": "jetbrains.annotations/2025.2.2",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "icon.png",
-        "jetbrains.annotations.2025.2.2.nupkg.sha512",
-        "jetbrains.annotations.nuspec",
-        "lib/net20/JetBrains.Annotations.dll",
-        "lib/net20/JetBrains.Annotations.xml",
-        "lib/netstandard1.0/JetBrains.Annotations.deps.json",
-        "lib/netstandard1.0/JetBrains.Annotations.dll",
-        "lib/netstandard1.0/JetBrains.Annotations.xml",
-        "lib/netstandard2.0/JetBrains.Annotations.deps.json",
-        "lib/netstandard2.0/JetBrains.Annotations.dll",
-        "lib/netstandard2.0/JetBrains.Annotations.xml",
-        "lib/portable40-net40+sl5+win8+wp8+wpa81/JetBrains.Annotations.dll",
-        "lib/portable40-net40+sl5+win8+wp8+wpa81/JetBrains.Annotations.xml",
-        "readme.md"
-      ]
-    }
-  },
+  "libraries": {},
   "projectFileDependencyGroups": {
-    "net8.0": [
-      "GodotSharp >= 4.5.0-rc.1",
-      "JetBrains.Annotations >= 2025.2.2"
-    ]
+    "net8.0": []
   },
   "packageFolders": {
     "C:\\Users\\Chris\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "0.1.0",
     "restore": {
       "projectUniqueName": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
-      "projectName": "Achievements",
+      "projectName": "GameAchievements",
       "projectPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
       "packagesPath": "C:\\Users\\Chris\\.nuget\\packages\\",
       "outputPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\obj\\",
@@ -122,16 +55,6 @@
     "frameworks": {
       "net8.0": {
         "targetAlias": "net8.0",
-        "dependencies": {
-          "GodotSharp": {
-            "target": "Package",
-            "version": "[4.5.0-rc.1, )"
-          },
-          "JetBrains.Annotations": {
-            "target": "Package",
-            "version": "[2025.2.2, )"
-          }
-        },
         "imports": [
           "net461",
           "net462",

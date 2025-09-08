@@ -4,11 +4,18 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>GameAchievements</PackageId>
+        <Version>0.1.0</Version>
+        <Authors>Christos Maragkos</Authors>
+        <RepositoryUrl>https://github.com/ChristosMaragkos/GameAchievements</RepositoryUrl>
+        <Description>Framework for creating/managing game achievements.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
-
+    
     <ItemGroup>
-      <PackageReference Include="GodotSharp" Version="4.5.0-rc.1" />
-      <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+        <None Include="README.md" Pack="true" PackagePath="" />
     </ItemGroup>
-
+    
 </Project>
