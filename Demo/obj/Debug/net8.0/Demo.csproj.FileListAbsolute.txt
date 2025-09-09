@@ -17,3 +17,4 @@ D:\coding projects\csharp\Achievements\Demo\obj\Debug\net8.0\Demo.pdb
 D:\coding projects\csharp\Achievements\Demo\obj\Debug\net8.0\Demo.genruntimeconfig.cache
 D:\coding projects\csharp\Achievements\Demo\obj\Debug\net8.0\ref\Demo.dll
 D:\coding projects\csharp\Achievements\Demo\obj\Debug\net8.0\Demo.sourcelink.json
+D:\coding projects\csharp\Achievements\Demo\bin\Debug\net8.0\Registrar.dll

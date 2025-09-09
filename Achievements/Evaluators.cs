@@ -8,20 +8,16 @@ public interface ICriterionEvaluator
     bool Evaluate();
 }
 
-public sealed class SingleEvaluator<TC> : ICriterionEvaluator where TC : CriterionCondition<TC>
+public sealed class UpdatableEvaluator : ICriterionEvaluator
 {
-    private readonly AbstractCriterion<TC> _criterion;
-    private readonly Func<TC> _contextProvider;
+    private readonly IUpdatableCriterion _criterion;
     public string Label { get; }
-
-    public SingleEvaluator(string label, AbstractCriterion<TC> criterion, Func<TC> contextProvider)
+    public UpdatableEvaluator(string label, IUpdatableCriterion criterion)
     {
         Label = label;
         _criterion = criterion;
-        _contextProvider = contextProvider;
     }
-
-    public bool Evaluate() => _criterion.IsMet(_contextProvider());
+    public bool Evaluate() => _criterion.IsSatisfied;
 }
 
 public sealed class CompositeEvaluator : ICriterionEvaluator
@@ -50,4 +46,3 @@ public sealed class CompositeEvaluator : ICriterionEvaluator
             : _children.Any(c => c.Evaluate());
     }
 }
-

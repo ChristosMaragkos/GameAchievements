@@ -10,3 +10,4 @@ D:\coding projects\csharp\Achievements\Achievements\obj\Debug\net8.0\refint\Achi
 D:\coding projects\csharp\Achievements\Achievements\obj\Debug\net8.0\Achievements.pdb
 D:\coding projects\csharp\Achievements\Achievements\obj\Debug\net8.0\ref\Achievements.dll
 D:\coding projects\csharp\Achievements\Achievements\obj\Debug\net8.0\Achievements.sourcelink.json
+D:\coding projects\csharp\Achievements\Achievements\obj\Debug\net8.0\Achievements.csproj.AssemblyReference.cache

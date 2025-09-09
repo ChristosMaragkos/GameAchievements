@@ -56,9 +56,10 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
         }
     }
 
-    public IReadOnlyCollection<string> Keys => _entries.Keys;
-
-    public bool IsUnlocked(Achievement achievement) => _entries.TryGetValue(achievement.Name, out var e) && (e.WasUnlockedMutable || e.Achievement.IsUnlocked());
+    public bool IsUnlocked(Achievement achievement) =>
+        _entries.TryGetValue(achievement.Name,
+            out var e) &&
+        (e.WasUnlockedMutable || e.Achievement.IsUnlocked);
 
     public DateTime? GetUnlockDate(Achievement achievement) => _entries.TryGetValue(achievement.Name, out var e) ? e.UnlockedAtMutable : null;
 
@@ -88,7 +89,7 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
         if (e.WasUnlockedMutable)
             return false; // already recorded as unlocked
 
-        if (!e.Achievement.IsUnlocked())
+        if (!e.Achievement.IsUnlocked)
             return false; // still locked
 
         // transition to unlocked

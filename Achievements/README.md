@@ -1,21 +1,25 @@
 ﻿# Achievements Library
 
 A small, composable achievements framework with:
-- Pluggable criteria (AbstractCriterion<TCondition>) and conditions (CriterionCondition<TCondition>).
-- Heterogeneous evaluators that can be nested (CompositeEvaluator) and bound to independent contexts.
-- A fluent AchievementBuilder to define achievements with readable All/Any groups.
+- Pluggable criteria (AbstractCriterion<TCondition, TContext>) and conditions (ICondition<TContext>). Convenience self-referential base: AbstractCriterion<TContext> with CriterionCondition<TContext>.
+- Heterogeneous evaluators that can be nested (CompositeEvaluator) and bound to independent, lazily provided runtime contexts.
+- A fluent AchievementBuilder to define achievements with readable AllOf/AnyOf groups and explicit Add or AddCustom methods for flexible context injection.
 
 ## Core Types
 - ICriterion: Marker for a criterion.
-- AbstractCriterion<TCondition>: Base for concrete criteria; implements IsMet(TCondition).
-- CriterionCondition<TCondition>: Base for condition state; implement RequirementsMet.
+- ICriterion<TContext>: Runtime-evaluable criterion.
+- ICondition<TContext>: Requirement data that can test a runtime TContext.
+- CriterionCondition<TContext>: Convenience abstract base when condition & context share the same type.
+- AbstractCriterion<TCondition, TContext>: Base when requirement type (TCondition) differs from runtime context (TContext).
+- AbstractCriterion<TContext>: Convenience base for self-referential (same-type) requirement/context.
 - ICriterionEvaluator: Evaluates a unit or group of criteria.
-- SingleEvaluator<TCondition>: Binds a criterion to a Func<TCondition> context provider.
+- SingleEvaluator<TCondition,TContext>: Binds a criterion to a Func<TContext> context provider.
+- SingleEvaluator<TContext>: Backwards compatible self-referential wrapper.
 - CompositeEvaluator: Groups evaluators with All (AND) or Any (OR) semantics; allows nesting.
 - Achievement: Name, Description, and a root evaluator; IsUnlocked() evaluates the tree.
-- AchievementBuilder: Fluent API to compose achievements via Add/All/Any then Build().
+- AchievementBuilder: Fluent API to compose achievements via Add (self-referential) / AddCustom (distinct types) plus AllOf/AnyOf then Build().
 
-## Quick Start
+## Quick Start (Self-Referential Condition & Context)
 Create a criterion and condition:
 ```csharp
 public sealed class KillCountCondition : CriterionCondition<KillCountCondition>
@@ -27,9 +31,8 @@ public sealed class KillCountCondition : CriterionCondition<KillCountCondition>
 
 public sealed class KillCountCriterion : AbstractCriterion<KillCountCondition>
 {
-    private readonly KillCountCondition _condition;
-    public KillCountCriterion(int required) => _condition = new KillCountCondition { RequiredKills = required };
-    protected override KillCountCondition Condition => _condition;
+    public KillCountCriterion(int required) => Condition = new KillCountCondition { RequiredKills = required };
+    protected override KillCountCondition Condition { get; }
 }
 ```
 Bind to live state via a context provider and build achievements:
@@ -68,12 +71,12 @@ var versatile = AchievementBuilder
 // Nested: A AND ((B OR C) AND D)
 var nested = AchievementBuilder
     .CreateNew("Nested Mastery", "A AND ((B OR C) AND D)")
-    .All("Outer AND", outer =>
+    .AllOf("Outer AND", outer =>
     {
         outer.Add("A: >= 5 kills", new KillCountCriterion(5), KillsCtx);
-        outer.All("Inner AND", innerAnd =>
+        outer.AllOf("Inner AND", innerAnd =>
         {
-            innerAnd.Any("(B OR C)", innerOr =>
+            innerAnd.AnyOf("(B OR C)", innerOr =>
             {
                 innerOr.Add("B: 1500 score", new ScoreCriterion(1500), ScoreCtx);
                 innerOr.Add("C: >= 10 kills", new KillCountCriterion(10), KillsCtx);
@@ -81,6 +84,30 @@ var nested = AchievementBuilder
             innerAnd.Add("D: >= 60 minutes", new TimePlayedCriterion(60), TimeCtx);
         });
     })
+    .Build();
+```
+
+## Distinct Requirement vs Runtime Context (AddCustom)
+Sometimes your stored requirement type differs from the runtime context snapshot. Example: store only a threshold but evaluate against a broader PlayerState.
+```csharp
+public sealed class LevelRequirement : ICondition<PlayerState>
+{
+    public int RequiredLevel { get; init; }
+    public bool RequirementsMet(PlayerState ctx) => ctx.Level >= RequiredLevel;
+}
+
+public sealed class LevelCriterion : AbstractCriterion<LevelRequirement, PlayerState>
+{
+    public LevelCriterion(int minLevel) => Condition = new LevelRequirement { RequiredLevel = minLevel };
+    protected override LevelRequirement Condition { get; }
+}
+
+public sealed class PlayerState { public int Level { get; set; } }
+
+var player = new PlayerState();
+var levelAchievement = AchievementBuilder
+    .CreateNew("Novice", "Reach level 5")
+    .AddCustom("Level >= 5", new LevelCriterion(5), () => player)
     .Build();
 ```
 
@@ -105,7 +132,7 @@ Run:
 ```
 
 ## Design Tips
-- Keep conditions small, immutable data holders.
-- Context providers should snapshot current state for each evaluation.
+- Keep condition objects small & immutable; they are requirement data.
+- Context providers should build a fresh snapshot each evaluation (avoid mutation inside the object returned unless intentional).
+- Use AddCustom when the requirement (condition) type differs from the runtime context object.
 - Achievements evaluate on demand; add a tracker if you need evented unlocks or persistence.
-

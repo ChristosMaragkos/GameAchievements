@@ -13,7 +13,7 @@ public class Achievement
         Root = root;
     }
     
-    public virtual bool IsUnlocked() => Root.Evaluate();
+    public bool IsUnlocked { get; set; }
 
     public override string ToString() => $"{Name} - {Description}";
 }
@@ -36,30 +36,30 @@ public sealed class AchievementBuilder
 
     public static AchievementBuilder CreateNew(string name, string description) => new(name, description);
 
-    public AchievementBuilder Add<TC>(string label, AbstractCriterion<TC> criterion, Func<TC> context)
-        where TC : CriterionCondition<TC>
-    {
-        Current.With(new SingleEvaluator<TC>(label, criterion, context));
-        return this;
-    }
-
     public AchievementBuilder AllOf(string label, Action<AchievementBuilder> scope)
     {
         var group = new CompositeEvaluator(label, EvaluationMode.All);
-        Current.With(group);
-        _stack.Push(group);
-        scope(this);
-        _stack.Pop();
-        return this;
+        return CreateGroup(scope, group);
     }
 
     public AchievementBuilder AnyOf(string label, Action<AchievementBuilder> scope)
     {
         var group = new CompositeEvaluator(label, EvaluationMode.Any);
+        return CreateGroup(scope, group);
+    }
+
+    private AchievementBuilder CreateGroup(Action<AchievementBuilder> scope, CompositeEvaluator group)
+    {
         Current.With(group);
         _stack.Push(group);
         scope(this);
         _stack.Pop();
+        return this;
+    }
+
+    public AchievementBuilder Criterion(string label, IUpdatableCriterion criterion)
+    {
+        Current.With(new UpdatableEvaluator(label, criterion));
         return this;
     }
 
