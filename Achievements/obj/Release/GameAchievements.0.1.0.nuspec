@@ -8,11 +8,9 @@
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
     <readme>README.md</readme>
     <description>Framework for creating/managing game achievements.</description>
-    <repository type="git" url="https://github.com/ChristosMaragkos/GameAchievements" commit="75f601ebde574112a7297f97e1c3766cfe3ef36c" />
+    <repository type="git" url="https://github.com/ChristosMaragkos/GameAchievements" commit="36fd557ae38739a86fa53d6d845569cacdc08261" />
     <dependencies>
-      <group targetFramework="net8.0">
-        <dependency id="Registrar" version="1.1.0" exclude="Build,Analyzers" />
-      </group>
+      <group targetFramework="net8.0" />
     </dependencies>
   </metadata>
   <files>

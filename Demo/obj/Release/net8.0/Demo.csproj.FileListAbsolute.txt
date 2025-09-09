@@ -17,4 +17,3 @@ D:\coding projects\csharp\Achievements\Demo\obj\Release\net8.0\refint\Demo.dll
 D:\coding projects\csharp\Achievements\Demo\obj\Release\net8.0\Demo.pdb
 D:\coding projects\csharp\Achievements\Demo\obj\Release\net8.0\Demo.genruntimeconfig.cache
 D:\coding projects\csharp\Achievements\Demo\obj\Release\net8.0\ref\Demo.dll
-D:\coding projects\csharp\Achievements\Demo\bin\Release\net8.0\Registrar.dll

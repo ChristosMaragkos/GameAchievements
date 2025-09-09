@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net8.0": {
-      "GameAchievements/0.1.0": {
+      "GameAchievements/0.2.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "compile": {
@@ -15,7 +15,7 @@
     }
   },
   "libraries": {
-    "GameAchievements/0.1.0": {
+    "GameAchievements/0.2.0": {
       "type": "project",
       "path": "../Achievements/Achievements.csproj",
       "msbuildProject": "../Achievements/Achievements.csproj"
@@ -23,7 +23,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "GameAchievements >= 0.1.0"
+      "GameAchievements >= 0.2.0"
     ]
   },
   "packageFolders": {
