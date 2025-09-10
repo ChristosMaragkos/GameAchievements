@@ -6,6 +6,8 @@ public interface ICriterionEvaluator
 {
     string Label { get; }
     bool Evaluate();
+    
+    float GetProgress();
 }
 
 public sealed class UpdatableEvaluator : ICriterionEvaluator
@@ -18,11 +20,13 @@ public sealed class UpdatableEvaluator : ICriterionEvaluator
         _criterion = criterion;
     }
     public bool Evaluate() => _criterion.IsSatisfied;
+    
+    public float GetProgress() => _criterion.GetProgress();
 }
 
 public sealed class CompositeEvaluator : ICriterionEvaluator
 {
-    private readonly List<ICriterionEvaluator> _children = [];
+    public readonly List<ICriterionEvaluator> Children = [];
     private readonly EvaluationMode _mode;
     public string Label { get; }
 
@@ -34,15 +38,23 @@ public sealed class CompositeEvaluator : ICriterionEvaluator
 
     public CompositeEvaluator With(ICriterionEvaluator evaluator)
     {
-        _children.Add(evaluator);
+        Children.Add(evaluator);
         return this;
+    }
+    
+    public float GetProgress()
+    {
+        if (Children.Count == 0) return _mode == EvaluationMode.All ? 1f : 0f;
+        return _mode == EvaluationMode.All
+            ? Children.Average(c => c.GetProgress())
+            : Children.Max(c => c.GetProgress());
     }
 
     public bool Evaluate()
     {
-        if (_children.Count == 0) return _mode == EvaluationMode.All;
+        if (Children.Count == 0) return _mode == EvaluationMode.All;
         return _mode == EvaluationMode.All
-            ? _children.All(c => c.Evaluate())
-            : _children.Any(c => c.Evaluate());
+            ? Children.All(c => c.Evaluate())
+            : Children.Any(c => c.Evaluate());
     }
 }

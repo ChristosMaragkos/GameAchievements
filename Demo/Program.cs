@@ -1,43 +1,55 @@
 ﻿using Achievements;
 using Demo;
 
-// Push-based demo: criteria hold their own state; game/events push context directly.
-// Builder only references existing criterion instances via AddUpdatable (no context providers / snapshots).
-// Same criterion can participate in multiple achievements simultaneously.
+// Simplified criteria demo using generic CriterionRoot + condition objects.
+// Final expected states:
+//  - Undead Pressure: locked
+//  - Risky Start: UNLOCKED
+//  - Bones or Fortune: UNLOCKED
+//  - Branching Nemesis: UNLOCKED
+//  - Ogre Pressure: UNLOCKED
+//  - High Score Master: locked
+//  - Grand Master: locked
+//  - #NoLife: UNLOCKED
 
-// --- Static (or long-lived) criterion instances ---
-var kill10Zombies = KillTypeCountCriterion.Create("Kill 10 Zombies", "Zombie", 10);
-var kill5Zombies = KillTypeCountCriterion.Create("Kill 5 Zombies", "Zombie", 5);
-var kill2Skeletons = KillTypeCountCriterion.Create("Kill 2 Skeletons", "Skeleton", 2);
-var kill5Skeletons = KillTypeCountCriterion.Create("Kill 5 Skeletons", "Skeleton", 5);
-var kill3Ogres = KillTypeCountCriterion.Create("Kill 3 Ogres", "Ogre", 3);
-var score10 = ScoreAccumulationCriterion.Create("Score 10", 10);
-var score25 = ScoreAccumulationCriterion.Create("Score 25", 25);
-var score50 = ScoreAccumulationCriterion.Create("Score 50", 50);
-var score100 = ScoreAccumulationCriterion.Create("Score 100", 100);
-var deaths1 = DeathCountCriterion.Create("Die Once", 1);
-var deaths2 = DeathCountCriterion.Create("Die Twice", 2);
+// Create per-achievement handles via root criteria registry (condition instances carry progress).
+var hKill10Zombies   = Criteria.Kills.Create("Kill 10 Zombies", new KillTypeCountCondition("Zombie", 10));
+var hKill5Zombies    = Criteria.Kills.Create("Kill 5 Zombies",  new KillTypeCountCondition("Zombie", 5));
+var hKill2Skeletons  = Criteria.Kills.Create("Kill 2 Skeletons",new KillTypeCountCondition("Skeleton", 2));
+var hKill5Skeletons  = Criteria.Kills.Create("Kill 5 Skeletons",new KillTypeCountCondition("Skeleton", 5));
+var hKill3Ogres      = Criteria.Kills.Create("Kill 3 Ogres",    new KillTypeCountCondition("Ogre", 3));
 
-// Example composite usage: achievements referencing overlapping criteria
+var hScore5   = Criteria.Score.Create("Score 5",   new ScoreAccumulationCondition(5));
+var hScore10  = Criteria.Score.Create("Score 10",  new ScoreAccumulationCondition(10));
+var hScore25  = Criteria.Score.Create("Score 25",  new ScoreAccumulationCondition(25));
+var hScore50  = Criteria.Score.Create("Score 50",  new ScoreAccumulationCondition(50));
+var hScore100 = Criteria.Score.Create("Score 100", new ScoreAccumulationCondition(100));
+
+var hDieOnce  = Criteria.Deaths.Create("Die Once",  new DeathCountCondition(1));
+var hDieTwice = Criteria.Deaths.Create("Die Twice", new DeathCountCondition(2));
+
+var hPlay10Minutes = Criteria.PlayTime.Create("Play 10 minutes",new PlayTimeCondition(10));
+
+// Achievement definitions.
 var aUndeadPressure = AchievementBuilder
     .CreateNew("Undead Pressure", "Kill 10 zombies AND (Score 10 OR Die 2 times)")
-    .AllOf("Root AND", all =>
+    .AllOf("Root", all =>
     {
-        all.Criterion("10 Zombies", kill10Zombies);
-        all.AnyOf("Score OR Deaths", any =>
+        all.Criterion("10 Zombies", hKill10Zombies);
+        all.AnyOf("Score10 OR Deaths2", any =>
         {
-            any.Criterion("Score 10", score10);
-            any.Criterion("Deaths 2", deaths2);
+            any.Criterion("Score 10", hScore10);
+            any.Criterion("Die Twice", hDieTwice);
         });
     })
     .Build();
 
 var aRiskyStart = AchievementBuilder
     .CreateNew("Risky Start", "Score 5 AND Die once")
-    .AllOf("Score & Death", all =>
+    .AllOf("Both", all =>
     {
-        all.Criterion("Score 10 (>=5 placeholder)", score10); // reuse Score10 as minimal example (first 10 covers 5)
-        all.Criterion("Die Once", deaths1);
+        all.Criterion("Score 5", hScore5);
+        all.Criterion("Die Once", hDieOnce);
     })
     .Build();
 
@@ -45,75 +57,74 @@ var aBonesOrFortune = AchievementBuilder
     .CreateNew("Bones or Fortune", "Kill 2 skeletons OR Score 50")
     .AnyOf("Either", any =>
     {
-        any.Criterion("2 Skeletons", kill2Skeletons);
-        any.Criterion("Score 50", score50);
+        any.Criterion("2 Skeletons", hKill2Skeletons);
+        any.Criterion("Score 50", hScore50);
     })
     .Build();
 
 var aBranchingNemesis = AchievementBuilder
     .CreateNew("Branching Nemesis", "Kill 5 skeletons OR 5 zombies")
-    .AnyOf("Either Path", any =>
+    .AnyOf("Either", any =>
     {
-        any.Criterion("5 Skeletons", kill5Skeletons);
-        any.Criterion("5 Zombies", kill5Zombies);
+        any.Criterion("5 Skeletons", hKill5Skeletons);
+        any.Criterion("5 Zombies", hKill5Zombies);
     })
     .Build();
 
 var aOgrePressure = AchievementBuilder
     .CreateNew("Ogre Pressure", "Kill 3 ogres AND Score 25")
-    .AllOf("AND", all =>
+    .AllOf("Both", all =>
     {
-        all.Criterion("3 Ogres", kill3Ogres);
-        all.Criterion("Score 25", score25);
+        all.Criterion("3 Ogres", hKill3Ogres);
+        all.Criterion("Score 25", hScore25);
     })
     .Build();
 
 var aHighScoreMaster = AchievementBuilder
-    .CreateNew("High Score Master", "(Score 100 OR (Score 50 AND Die 0 times)) AND (10 Zombies OR 5 Skeletons)")
+    .CreateNew("High Score Master", "(Score 100) AND (10 Zombies OR 5 Skeletons)")
     .AllOf("Root", root =>
     {
-        root.AnyOf("Score Paths", any =>
+        root.Criterion("Score 100", hScore100);
+        root.AnyOf("Kills", any =>
         {
-            any.Criterion("Score 100", score100);
-            any.AllOf("Score 50 AND Survive", all =>
-            {
-                all.Criterion("Score 50", score50);
-                // Survival path: simply requires Deaths1 NOT to trigger; for demo we approximate by absence (no separate criterion)
-                // Could implement a dedicated 'NoDeathCriterion'. Skipped for brevity.
-            });
-        });
-        root.AnyOf("Kill Mix", any =>
-        {
-            any.Criterion("10 Zombies", kill10Zombies);
-            any.Criterion("5 Skeletons", kill5Skeletons);
+            any.Criterion("10 Zombies", hKill10Zombies);
+            any.Criterion("5 Skeletons", hKill5Skeletons);
         });
     })
     .Build();
 
 var aGrandMaster = AchievementBuilder
-    .CreateNew("Grand Master", "Complex nested demo using shared criteria")
+    .CreateNew("Grand Master", "Score 100, Kill 10 Zombies, and branching extras")
     .AllOf("GM Root", root =>
     {
-        root.Criterion("Score 100", score100);
-        root.Criterion("10 Zombies", kill10Zombies);
-        root.AnyOf("Ogres OR Skeleton/Zombie Mix", any =>
+        root.Criterion("Score 100", hScore100);
+        root.Criterion("10 Zombies", hKill10Zombies);
+        root.AnyOf("Ogres OR Mixed", any =>
         {
-            any.Criterion("3 Ogres", kill3Ogres);
-            any.AllOf("Skel/Zom Path", all =>
+            any.Criterion("3 Ogres", hKill3Ogres);
+            any.AllOf("Skeleton/Zombie Mix", all =>
             {
-                all.Criterion("5 Skeletons", kill5Skeletons);
-                all.Criterion("5 Zombies", kill5Zombies);
+                all.Criterion("5 Skeletons", hKill5Skeletons);
+                all.Criterion("5 Zombies", hKill5Zombies);
             });
         });
         root.AnyOf("Risk Branch", any =>
         {
-            any.AllOf("Risky", all =>
+            any.AllOf("Die/Score Path", all =>
             {
-                all.Criterion("Die Twice", deaths2);
-                all.Criterion("Score 50", score50);
+                all.Criterion("Die Twice", hDieTwice);
+                all.Criterion("Score 50", hScore50);
             });
-            any.Criterion("Score 25", score25);
+            any.Criterion("Score 25", hScore25);
         });
+    })
+    .Build();
+
+var aNoLife = AchievementBuilder
+    .CreateNew("#NoLife", "Play for 10 minutes")
+    .AllOf("Play 10 Minutes", root =>
+    {
+        root.Criterion("Play 10 Minutes", hPlay10Minutes);
     })
     .Build();
 
@@ -125,64 +136,39 @@ var achievements = new[]
     aBranchingNemesis,
     aOgrePressure,
     aHighScoreMaster,
-    aGrandMaster
+    aGrandMaster,
+    aNoLife
 };
 
 var tracker = new AchievementTracker();
 tracker.OnUnlocked += (a, when) => Console.WriteLine($"[Unlocked] {a.Name} @ {when:HH:mm:ss}");
 foreach (var a in achievements) tracker.Register(a, evaluateImmediately:false);
 
-// Event stream: type, value (enemyType for kills or delta score / deaths)
 var events = new (string Kind, string Data, int Amount)[]
 {
-    ("kill","Zombie",1),
-    ("score","+",3),
-    ("kill","Skeleton",1),
-    ("kill","Zombie",1),
-    ("death","+",1),
-    ("score","+",7), // Score10 reached
-    ("kill","Skeleton",1), // 2 skeletons
-    ("kill","Ogre",1),
-    ("kill","Zombie",3),
-    ("kill","Ogre",1),
-    ("kill","Zombie",2),
-    ("score","+",15), // Score25 & Score50 partial
-    ("kill","Ogre",1), // 3 ogres
-    ("kill","Zombie",2),
-    ("death","+",1),  // Deaths2
-    ("score","+",25), // Score50
-    ("score","+",50), // Score100
-    ("kill","Skeleton",3),
-    ("kill","Zombie",1),
+    ("kill","Skeleton",1), ("score","+",3), ("kill","Skeleton",1), ("death","+",1), ("score","+",2),
+    ("kill","Ogre",1), ("score","+",5), ("kill","Skeleton",1), ("kill","Zombie",1), ("kill","Skeleton",1),
+    ("score","+",10), ("kill","Ogre",1), ("kill","Zombie",1), ("kill","Skeleton",1), ("score","+",10),
+    ("kill","Ogre",1), ("kill","Zombie",1), ("kill","Zombie",1),("time", "+", 5),("time","+",5)
 };
 
-Console.WriteLine("Starting push-based achievement simulation...\n");
+Console.WriteLine("Starting simplified achievement simulation...\n");
 var step = 0;
 foreach (var e in events)
 {
     step++;
     switch (e.Kind)
     {
-        case "kill":
-            // Push enemy type into all kill-related criteria (they internally filter)
-            kill10Zombies.Evaluate(e.Data);
-            kill5Zombies.Evaluate(e.Data);
-            kill2Skeletons.Evaluate(e.Data);
-            kill5Skeletons.Evaluate(e.Data);
-            kill3Ogres.Evaluate(e.Data);
+        case "kill": Criteria.Kills.Evaluate(new KillTypeCountCondition(e.Data, e.Amount)); break;
+        case "score": Criteria.Score.Evaluate(e.Amount); break;
+        case "death": Criteria.Deaths.Evaluate(e.Amount); break;
+        case "time":
+        {
+            Criteria.PlayTime.Evaluate(e.Amount);
+            Console.WriteLine($"Play time current progress: {hPlay10Minutes.GetProgress():P1}");
             break;
-        case "score":
-            score10.Evaluate(e.Amount);
-            score25.Evaluate(e.Amount);
-            score50.Evaluate(e.Amount);
-            score100.Evaluate(e.Amount);
-            break;
-        case "death":
-            deaths1.Evaluate(e.Amount);
-            deaths2.Evaluate(e.Amount);
-            break;
+        }
     }
-
     tracker.EvaluateAll();
 
     Console.WriteLine($"Event {step,-2}: {e.Kind} {e.Data} (+{e.Amount})");

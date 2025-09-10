@@ -1,138 +1,100 @@
-﻿# Achievements Library
+﻿# Achievements Library (Stateless Root Pattern)
 
-A small, composable achievements framework with:
-- Pluggable criteria (AbstractCriterion<TCondition, TContext>) and conditions (ICondition<TContext>). Convenience self-referential base: AbstractCriterion<TContext> with CriterionCondition<TContext>.
-- Heterogeneous evaluators that can be nested (CompositeEvaluator) and bound to independent, lazily provided runtime contexts.
-- A fluent AchievementBuilder to define achievements with readable AllOf/AnyOf groups and explicit Add or AddCustom methods for flexible context injection.
+A composable achievements framework using a stateless root criteria pattern:
+- Central singleton root criteria (e.g. Criteria.Kills / Score / Deaths) expose Create(condition) which returns per-achievement handles.
+- Runtime events (kills, score changes, deaths) are pushed once into the root (root.Evaluate(context)), which fans out to every handle.
+- Achievement trees are composed from handles (no direct game state snapshot passing, no per-achievement polling logic).
 
-## Core Types
-- ICriterion: Marker for a criterion.
-- ICriterion<TContext>: Runtime-evaluable criterion.
-- ICondition<TContext>: Requirement data that can test a runtime TContext.
-- CriterionCondition<TContext>: Convenience abstract base when condition & context share the same type.
-- AbstractCriterion<TCondition, TContext>: Base when requirement type (TCondition) differs from runtime context (TContext).
-- AbstractCriterion<TContext>: Convenience base for self-referential (same-type) requirement/context.
-- ICriterionEvaluator: Evaluates a unit or group of criteria.
-- SingleEvaluator<TCondition,TContext>: Binds a criterion to a Func<TContext> context provider.
-- SingleEvaluator<TContext>: Backwards compatible self-referential wrapper.
-- CompositeEvaluator: Groups evaluators with All (AND) or Any (OR) semantics; allows nesting.
-- Achievement: Name, Description, and a root evaluator; IsUnlocked() evaluates the tree.
-- AchievementBuilder: Fluent API to compose achievements via Add (self-referential) / AddCustom (distinct types) plus AllOf/AnyOf then Build().
+## Core Concepts
+- AbstractCriterion<TCondition,TContext,TProgress>: Public base for creating a root criterion. You implement creation of initial progress and mutation logic; framework manages handles & fan-out.
+- Condition record/class: Immutable requirement data (EnemyType, Required, etc.).
+- Progress (TProgress): Arbitrary mutable state tracked per handle (e.g. int count, struct with multiple counters).
+- Handle (IUpdatableCriterion): Internal per-achievement progress state (framework-generated; not user implemented).
+- Criteria registry: Static singleton instances (Criteria.Kills, Criteria.Score, Criteria.Deaths).
+- AchievementBuilder: Fluent AllOf / AnyOf composition of handles.
+- AchievementTracker: Evaluates unlock transitions and persists via IAchievementStore.
 
-## Quick Start (Self-Referential Condition & Context)
-Create a criterion and condition:
+## Why This Pattern?
+- Single authoritative event stream per context type.
+- Many achievements share same events with distinct conditions.
+- No duplicated event dispatch logic per instance.
+- Simple persistence (usually only unlocked names).
+
+## Example: Defining Achievements
 ```csharp
-public sealed class KillCountCondition : CriterionCondition<KillCountCondition>
-{
-    public int Kills { get; init; }
-    public int RequiredKills { get; init; }
-    public override bool RequirementsMet(KillCountCondition ctx) => ctx.Kills >= RequiredKills;
-}
+var kill10Zombies = Criteria.Kills.Create("Kill 10 Zombies", new KillTypeCountRoot.Condition("Zombie", 10));
+var score25       = Criteria.Score.Create("Score 25", new ScoreRoot.Condition(25));
+var dieTwice      = Criteria.Deaths.Create("Die Twice", new DeathRoot.Condition(2));
 
-public sealed class KillCountCriterion : AbstractCriterion<KillCountCondition>
-{
-    public KillCountCriterion(int required) => Condition = new KillCountCondition { RequiredKills = required };
-    protected override KillCountCondition Condition { get; }
-}
-```
-Bind to live state via a context provider and build achievements:
-```csharp
-var state = new GameState();
-Func<KillCountCondition> KillsCtx = () => new KillCountCondition { Kills = state.Kills };
-Func<TimePlayedCondition> TimeCtx = () => new TimePlayedCondition { MinutesPlayed = state.Minutes };
-Func<ScoreCondition> ScoreCtx = () => new ScoreCondition { Score = state.Score };
-
-// Single criterion
-var firstBlood = AchievementBuilder
-    .CreateNew("First Blood", "Get your first kill")
-    .Add(">= 1 kill", new KillCountCriterion(1), KillsCtx)
-    .Build();
-
-// AND (All)
-var grinder = AchievementBuilder
-    .CreateNew("Grinder", "10 kills AND 30 minutes")
-    .AllOf("All of", b =>
+var achievement = AchievementBuilder
+    .CreateNew("Pressure", "Kill 10 zombies AND (Score 25 OR Die Twice)")
+    .AllOf("Root", all =>
     {
-        b.Add(">= 10 kills", new KillCountCriterion(10), KillsCtx);
-        b.Add(">= 30 minutes", new TimePlayedCriterion(30), TimeCtx);
-    })
-    .Build();
-
-// OR (Any)
-var versatile = AchievementBuilder
-    .CreateNew("Versatile", "1000 score OR 50 kills")
-    .AnyOf("Either", b =>
-    {
-        b.Add("1000 score", new ScoreCriterion(1000), ScoreCtx);
-        b.Add("50 kills", new KillCountCriterion(50), KillsCtx);
-    })
-    .Build();
-
-// Nested: A AND ((B OR C) AND D)
-var nested = AchievementBuilder
-    .CreateNew("Nested Mastery", "A AND ((B OR C) AND D)")
-    .AllOf("Outer AND", outer =>
-    {
-        outer.Add("A: >= 5 kills", new KillCountCriterion(5), KillsCtx);
-        outer.AllOf("Inner AND", innerAnd =>
+        all.Criterion("10 Zombies", kill10Zombies);
+        all.AnyOf("Branch", any =>
         {
-            innerAnd.AnyOf("(B OR C)", innerOr =>
-            {
-                innerOr.Add("B: 1500 score", new ScoreCriterion(1500), ScoreCtx);
-                innerOr.Add("C: >= 10 kills", new KillCountCriterion(10), KillsCtx);
-            });
-            innerAnd.Add("D: >= 60 minutes", new TimePlayedCriterion(60), TimeCtx);
+            any.Criterion("Score 25", score25);
+            any.Criterion("Die Twice", dieTwice);
         });
     })
     .Build();
 ```
 
-## Distinct Requirement vs Runtime Context (AddCustom)
-Sometimes your stored requirement type differs from the runtime context snapshot. Example: store only a threshold but evaluate against a broader PlayerState.
+## Pushing Events
 ```csharp
-public sealed class LevelRequirement : ICondition<PlayerState>
-{
-    public int RequiredLevel { get; init; }
-    public bool RequirementsMet(PlayerState ctx) => ctx.Level >= RequiredLevel;
-}
-
-public sealed class LevelCriterion : AbstractCriterion<LevelRequirement, PlayerState>
-{
-    public LevelCriterion(int minLevel) => Condition = new LevelRequirement { RequiredLevel = minLevel };
-    protected override LevelRequirement Condition { get; }
-}
-
-public sealed class PlayerState { public int Level { get; set; } }
-
-var player = new PlayerState();
-var levelAchievement = AchievementBuilder
-    .CreateNew("Novice", "Reach level 5")
-    .AddCustom("Level >= 5", new LevelCriterion(5), () => player)
-    .Build();
+Criteria.Kills.Evaluate("Zombie");
+Criteria.Score.Evaluate(5);
+Criteria.Deaths.Evaluate(1);
 ```
 
-## Static readonly achievements
+## Tracking Unlocks
 ```csharp
-public static class GameAchievements
+var tracker = new AchievementTracker();
+tracker.Register(achievement);
+tracker.EvaluateAll();
+```
+
+## Built-in Root Criteria
+- KillTypeCountRoot (string enemyType)
+- ScoreRoot (int deltaScore)
+- DeathRoot (int deltaDeaths)
+
+## Creating a Custom Criterion
+Implement a condition + criterion class only.
+```csharp
+public sealed class DistanceRoot : AbstractCriterion<DistanceRoot.Condition, double, double>
 {
-    public static readonly Achievement FirstBlood = AchievementBuilder
-        .CreateNew("First Blood", "Get your first kill")
-        .Add(">= 1 kill", new KillCountCriterion(1), () => new KillCountCondition { Kills = Game.State.Kills })
-        .Build();
+    public sealed record Condition(double RequiredMeters);
+    protected override double CreateInitialProgress(Condition c) => 0d;
+    protected override bool UpdateProgress(ref double progress, Condition c, double deltaMeters)
+    {
+        progress += deltaMeters;
+        return progress >= c.RequiredMeters;
+    }
+}
+// Register
+public static class Criteria
+{
+    public static readonly DistanceRoot Distance = new();
+}
+// Use
+var run100 = Criteria.Distance.Create("Run 100m", new DistanceRoot.Condition(100));
+```
+
+## Optional DSL Extensions
+```csharp
+public static class AchievementBuilderExtensions
+{
+    public static AchievementBuilder Kill(this AchievementBuilder b, string label, string enemy, int count)
+        => b.Criterion(label, Criteria.Kills.Create(label, new KillTypeCountRoot.Condition(enemy, count)));
 }
 ```
 
-## Demo
-This repo includes a Demo console app that simulates state changes and prints unlock statuses.
+## Persistence
+Store unlocked achievement names (IAchievementStore). Mid-progress serialization optional; expose Handles() if needed.
 
-Run:
-```bash
- dotnet build
- dotnet run --project Demo/Demo.csproj
-```
+## Migration Notes
+Legacy root base replaced by AbstractCriterion<TCondition,TContext,TProgress>.
 
-## Design Tips
-- Keep condition objects small & immutable; they are requirement data.
-- Context providers should build a fresh snapshot each evaluation (avoid mutation inside the object returned unless intentional).
-- Use AddCustom when the requirement (condition) type differs from the runtime context object.
-- Achievements evaluate on demand; add a tracker if you need evented unlocks or persistence.
+## License
+MIT

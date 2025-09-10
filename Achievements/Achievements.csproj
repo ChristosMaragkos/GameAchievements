@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>GameAchievements</PackageId>
-        <Version>0.2.0</Version>
+        <Version>1.0.0</Version>
         <Authors>Christos Maragkos</Authors>
         <RepositoryUrl>https://github.com/ChristosMaragkos/GameAchievements</RepositoryUrl>
         <Description>Framework for creating/managing game achievements.</Description>

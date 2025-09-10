@@ -13,9 +13,14 @@ public class Achievement
         Root = root;
     }
     
-    public bool IsUnlocked { get; set; }
+    public bool IsUnlocked => Root.Evaluate();
 
     public override string ToString() => $"{Name} - {Description}";
+    
+    public float GetTotalProgress()
+    {
+        return Root.GetProgress();
+    }
 }
 
 public sealed class AchievementBuilder
