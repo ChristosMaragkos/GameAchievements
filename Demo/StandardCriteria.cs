@@ -27,13 +27,7 @@ public sealed class KillTypeCountCondition : ICriterionCondition<KillTypeCountCo
         EnemyType = enemyType;
         Required = amountRequired;
     }
-    public bool Apply(string enemyType)
-    {
-        if (IsSatisfied) return false;
-        if (!string.Equals(enemyType, EnemyType, StringComparison.OrdinalIgnoreCase)) return false;
-        _count++;
-        return IsSatisfied;
-    }
+
     public void Reset() => _count = 0;
 }
 

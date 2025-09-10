@@ -5,22 +5,32 @@ public class Achievement
     public string Name { get; }
     public string Description { get; }
     public ICriterionEvaluator Root { get; }
-    
+
     public Achievement(string name, string description, ICriterionEvaluator root)
     {
         Name = name;
         Description = description;
         Root = root;
     }
-    
-    public bool IsUnlocked => Root.Evaluate();
+
+    private bool _wasUnlocked;
+
+    public bool IsUnlocked()
+    {
+        if (_wasUnlocked || !Root.Evaluate()) return _wasUnlocked;
+        _wasUnlocked = true;
+        OnUnlocked.Invoke(this);
+        return _wasUnlocked;
+    }
 
     public override string ToString() => $"{Name} - {Description}";
-    
+
     public float GetTotalProgress()
     {
         return Root.GetProgress();
     }
+
+    public event Action<Achievement> OnUnlocked =  delegate { };
 }
 
 public sealed class AchievementBuilder

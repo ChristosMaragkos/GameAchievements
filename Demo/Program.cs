@@ -173,10 +173,10 @@ foreach (var e in events)
 
     Console.WriteLine($"Event {step,-2}: {e.Kind} {e.Data} (+{e.Amount})");
     foreach (var a in achievements)
-        Console.WriteLine($"   * {a.Name}: {(a.IsUnlocked ? "UNLOCKED" : "locked")}");
+        Console.WriteLine($"   * {a.Name}: {(a.IsUnlocked() ? "UNLOCKED" : "locked")}");
     Console.WriteLine();
 }
 
 Console.WriteLine("Final States:\n");
 foreach (var a in achievements)
-    Console.WriteLine($" - {a.Name}: {(a.IsUnlocked?"UNLOCKED":"locked")}");
+    Console.WriteLine($" - {a.Name}: {(a.IsUnlocked()?"UNLOCKED":"locked")}");
