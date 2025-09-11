@@ -169,7 +169,6 @@ foreach (var e in events)
             break;
         }
     }
-    tracker.EvaluateAll();
 
     Console.WriteLine($"Event {step,-2}: {e.Kind} {e.Data} (+{e.Amount})");
     foreach (var a in achievements)

@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "lICJlY9BQHc=",
+  "dgSpecHash": "MQb8n8mNPQY=",
   "success": true,
   "projectFilePath": "D:\\coding projects\\csharp\\Achievements\\Demo\\Demo.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Chris\\.nuget\\packages\\gameachievements\\1.0.1\\gameachievements.1.0.1.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

@@ -10,6 +10,15 @@ public interface ICriterionCondition<in TContext>
 }
 public interface IResettableCondition { void Reset(); }
 
+// Global bus to notify when any condition transitions to satisfied.
+internal static class CriterionEvents
+{
+    internal sealed record ConditionSatisfied(object CriterionInstance, string ConditionName);
+    internal static event Action<ConditionSatisfied> OnConditionSatisfied = delegate { };
+    internal static void Raise(object criterionInstance, string conditionName)
+        => OnConditionSatisfied(new ConditionSatisfied(criterionInstance, conditionName));
+}
+
 public abstract class AbstractCriterion<TCondition, TContext>
     where TCondition : ICriterionCondition<TContext>
 {
@@ -51,12 +60,21 @@ public abstract class AbstractCriterion<TCondition, TContext>
 
     /// <summary>
     /// Pushes runtime context to all registered conditions.
+    /// Raises a global event when any condition transitions to satisfied.
     /// </summary>
     public void Evaluate(TContext context)
     {
         var local = _snapshot; // immutable snapshot for lock-free iteration
         foreach (var entry in local)
+        {
+            var was = entry.IsSatisfied;
             entry.Apply(context);
+            var now = entry.IsSatisfied;
+            if (!was && now)
+            {
+                CriterionEvents.Raise(this, entry.Name);
+            }
+        }
     }
 
     /// <summary>

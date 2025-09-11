@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "Achievements/1.0.1": {
+      "Achievements/1.0.2": {
         "runtime": {
           "Achievements.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "Achievements/1.0.1": {
+    "Achievements/1.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

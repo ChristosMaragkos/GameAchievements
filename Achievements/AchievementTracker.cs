@@ -33,11 +33,20 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
 
     public event Action<Achievement, DateTime> OnUnlocked = delegate { };
 
+    // Subscribe to criterion satisfaction to auto-evaluate all achievements.
+    public AchievementTracker() : this(null) { }
+
     public void Register(Achievement achievement, bool evaluateImmediately = true)
     {
         var key = achievement.Name;
         if (_entries.ContainsKey(key))
             throw new InvalidOperationException($"Achievement with name '{key}' already registered.");
+
+        // Subscribe on first registration to avoid unused subscriptions when no tracker entries exist.
+        if (_entries.Count == 0)
+        {
+            CriterionEvents.OnConditionSatisfied += OnCriterionSatisfied;
+        }
 
         DateTime? unlockedAt = null;
         var wasUnlocked = false;
@@ -54,6 +63,11 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
         {
             Evaluate(achievement);
         }
+    }
+
+    private void OnCriterionSatisfied(CriterionEvents.ConditionSatisfied _)
+    {
+        EvaluateAll();
     }
 
     public bool IsUnlocked(Achievement achievement) =>
@@ -101,6 +115,3 @@ public sealed class AchievementTracker(IAchievementStore? store = null)
         return true;
     }
 }
-
-
-
