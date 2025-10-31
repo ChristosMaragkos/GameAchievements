@@ -10,12 +10,7 @@
         <RepositoryUrl>https://github.com/ChristosMaragkos/GameAchievements</RepositoryUrl>
         <Description>Framework for creating/managing game achievements.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
-    
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="" />
-    </ItemGroup>
     
 </Project>

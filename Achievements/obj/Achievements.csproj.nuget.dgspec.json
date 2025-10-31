@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj": {}
+    "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\Achievements.csproj": {}
   },
   "projects": {
-    "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj": {
-      "version": "1.0.2",
+    "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\Achievements.csproj": {
+      "version": "1.0.2.1",
       "restore": {
-        "projectUniqueName": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
+        "projectUniqueName": "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\Achievements.csproj",
         "projectName": "GameAchievements",
-        "projectPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
-        "packagesPath": "C:\\Users\\Chris\\.nuget\\packages\\",
-        "outputPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\obj\\",
+        "projectPath": "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\Achievements.csproj",
+        "packagesPath": "C:\\Users\\chris\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Chris\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\chris\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
