@@ -8,24 +8,31 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\chris\\.nuget\\packages\\": {}
+    "C:\\Users\\Chris\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.2.1",
     "restore": {
-      "projectUniqueName": "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\Achievements.csproj",
+      "projectUniqueName": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
       "projectName": "GameAchievements",
-      "projectPath": "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\Achievements.csproj",
-      "packagesPath": "C:\\Users\\chris\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\chris\\RiderProjects\\GameAchievements\\Achievements\\obj\\",
+      "projectPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\Achievements.csproj",
+      "packagesPath": "C:\\Users\\Chris\\.nuget\\packages\\",
+      "outputPath": "D:\\coding projects\\csharp\\Achievements\\Achievements\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\chris\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Chris\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

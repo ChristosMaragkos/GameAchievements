@@ -1,24 +1,13 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Achievements.AchievementLogic;
 using Achievements.Criteria;
-using Xunit.Abstractions;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Tests;
 
 public class UnitTest1
 {
-    private readonly ITestOutputHelper _testOutputHelper;
 
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
-    {
-        WriteIndented = true
-    };
-
-    public UnitTest1(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
 
     #region Setup
 
@@ -55,7 +44,7 @@ public class UnitTest1
         
         _useToolAchievement = new Achievement(
             "TEST_USE_TOOL", "10_TIMES", 
-            new UseToolConditions(10));
+            ConditionsInstance);
         
         _criterionInstance = new UseToolCriterion(_useToolAchievement);
     }
@@ -71,10 +60,9 @@ public class UnitTest1
     #endregion
     
     [Fact]
-    public void Test1()
+    public void AchievementUnlocks_OnlyAfterRequiredUses()
     {
         Reset();
-        _testOutputHelper.WriteLine(JsonSerializer.Serialize(_useToolAchievement, JsonSerializerOptions));
         while (_timesUsedTool < 9)
         {
             UseTool();
@@ -83,5 +71,20 @@ public class UnitTest1
         
         UseTool();
         Assert.Empty(_useToolAchievement.Conditions);
+    }
+
+    [Fact]
+    public void Achievement_FiresEvent_WhenUnlocked()
+    {
+        Reset();
+        var wasEventFired = false;
+        _useToolAchievement.OnUnlocked += _ => wasEventFired = true;
+        
+        while (_timesUsedTool < 10)
+        {
+            UseTool();
+        }
+        
+        Assert.True(wasEventFired);
     }
 }

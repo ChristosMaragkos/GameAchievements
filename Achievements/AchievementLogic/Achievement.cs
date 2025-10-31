@@ -11,6 +11,7 @@ public class Achievement
     [JsonIgnore] public bool IsUnlocked { get; private set; }
     [JsonPropertyName("criteria")] public List<ICondition> Conditions { get; init; }
 
+    [JsonConstructor]
     public Achievement(string name, string description, List<ICondition> conditions)
     {
         Name = name;
@@ -36,5 +37,8 @@ public class Achievement
     {
         IsUnlocked = true;
         UnlockDate = DateTime.Now;
+        OnUnlocked.Invoke(this);
     }
+    
+    public event Action<Achievement> OnUnlocked = delegate { };
 }
