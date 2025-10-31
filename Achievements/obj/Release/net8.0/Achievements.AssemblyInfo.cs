@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Framework for creating/managing game achievements.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.2.1")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.2.1+6884ee5c235d7c67b9f1c1a2c1b0e0de6f7b9025")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.2.1+073665fdba0d20b6599e155a078f2d58b99cd3d1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Achievements")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Achievements")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.2.1")]

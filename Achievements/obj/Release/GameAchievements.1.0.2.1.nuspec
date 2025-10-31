@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>GameAchievements</id>
+    <version>1.0.2.1</version>
+    <authors>Christos Maragkos</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <description>Framework for creating/managing game achievements.</description>
+    <repository type="git" url="https://github.com/ChristosMaragkos/GameAchievements" commit="073665fdba0d20b6599e155a078f2d58b99cd3d1" />
+    <dependencies>
+      <group targetFramework="net8.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\coding projects\csharp\Achievements\Achievements\bin\Release\net8.0\Achievements.dll" target="lib\net8.0\Achievements.dll" />
+  </files>
+</package>
